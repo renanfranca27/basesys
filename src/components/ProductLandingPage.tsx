@@ -1,0 +1,638 @@
+import { useEffect, useState } from 'react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Blocks,
+  Check,
+  Quote,
+  Scissors,
+  ShieldCheck,
+  ShoppingBag,
+  ShoppingCart,
+  UtensilsCrossed,
+} from 'lucide-react';
+import { motion, useReducedMotion } from 'motion/react';
+import type { BasesysProduct, NexaSegmentId } from '../data/products';
+import { ProductPreviewFrame } from './ProductPreviewFrame';
+import { LeadCaptureForm } from './LeadCaptureForm';
+
+interface ProductLandingPageProps {
+  product: BasesysProduct;
+  initialSegmentId?: NexaSegmentId;
+  onBackToHub: () => void;
+  onOpenDemoModal: (interestKey: string) => void;
+}
+
+const EASE_OUT_EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
+function getSegmentIcon(id: NexaSegmentId) {
+  switch (id) {
+    case 'lojas-varejo':
+      return ShoppingBag;
+    case 'mercados-padarias':
+      return ShoppingCart;
+    case 'bares-restaurantes':
+      return UtensilsCrossed;
+    case 'saloes-barbearias':
+      return Scissors;
+  }
+}
+
+export function ProductLandingPage({
+  product,
+  initialSegmentId,
+  onBackToHub,
+  onOpenDemoModal,
+}: ProductLandingPageProps) {
+  const prefersReducedMotion = useReducedMotion();
+
+  const resolveSegmentIndex = (segId?: NexaSegmentId) => {
+    if (!segId) return 0;
+    const idx = product.modules.findIndex((m) => m.id === segId);
+    return idx >= 0 ? idx : 0;
+  };
+
+  const [selectedModuleIdx, setSelectedModuleIdx] = useState(() =>
+    resolveSegmentIndex(initialSegmentId)
+  );
+
+  useEffect(() => {
+    if (initialSegmentId) {
+      setSelectedModuleIdx(resolveSegmentIndex(initialSegmentId));
+    }
+  }, [initialSegmentId]);
+
+  const currentModule = product.modules[selectedModuleIdx] ?? product.modules[0];
+
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  return (
+    <motion.div
+      key={product.id}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: EASE_OUT_EXPO }}
+      className="bg-[#F8FAFC] transition-colors duration-200 dark:bg-[#0B0F1D]"
+    >
+      {/* Contextual Sub-bar: Voltar + Atalho para os 4 Segmentos do NexaERP */}
+      <div className="border-b border-slate-200 bg-white dark:border-white/10 dark:bg-[#0D1224]">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+          <button
+            type="button"
+            onClick={onBackToHub}
+            className="inline-flex items-center gap-2 rounded text-xs font-semibold text-slate-600 transition-colors hover:text-[#06285A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F36319] dark:text-slate-300 dark:hover:text-[#F36319] whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+            <span>Voltar ao Portal Basesys</span>
+          </button>
+
+          <div className="flex items-center gap-1.5 overflow-x-auto">
+            {product.modules.map((seg, idx) => {
+              const active = idx === selectedModuleIdx;
+              return (
+                <button
+                  key={seg.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedModuleIdx(idx);
+                    scrollToSection('funcionalidades-produto');
+                  }}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    active
+                      ? 'bg-[#06285A] text-white dark:bg-[#F36319] dark:text-slate-950'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-[#161E35] dark:hover:text-white'
+                  }`}
+                >
+                  {seg.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Dedicated NexaERP Hero */}
+      <section className="border-b border-slate-200 bg-white py-16 dark:border-white/10 dark:bg-[#0B0F1D] lg:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-stretch">
+            <div className="lg:col-span-6 flex flex-col justify-between">
+              <div>
+                <p className="font-mono text-xs font-medium text-[#0284C7] dark:text-[#F36319]">
+                  {product.name} · {product.category}
+                </p>
+                <h1 className="mt-3 font-display text-[clamp(2.1rem,3.6vw,3.25rem)] font-bold leading-[1.08] tracking-[-0.025em] text-slate-900 dark:text-white">
+                  {product.headline}
+                </h1>
+                <p className="mt-5 max-w-xl text-base leading-relaxed text-slate-600 dark:text-slate-300 sm:text-lg">
+                  {product.description}
+                </p>
+
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <button
+                    type="button"
+                    onClick={() => scrollToSection('contato-produto')}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#06285A] px-6 py-3.5 text-sm font-semibold text-white transition-all duration-150 hover:bg-[#0D3878] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F36319] dark:bg-[#F36319] dark:text-slate-950 dark:shadow-[0_0_28px_rgba(243,99,25,0.25)] dark:hover:bg-[#FF7A38] whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    <span>Solicitar Demonstração do {product.shortName}</span>
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => scrollToSection('segmentos-nexa')}
+                    className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3.5 text-sm font-semibold text-slate-800 transition-colors hover:bg-slate-50 dark:border-white/15 dark:bg-[#161E35] dark:text-white dark:hover:bg-[#1D2745] whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    Ver 4 Segmentos
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-10 grid grid-cols-2 gap-6 border-t border-slate-200 pt-6 dark:border-white/10">
+                <div>
+                  <p className="font-display text-3xl font-bold text-[#06285A] tabular-nums dark:text-[#F36319]">
+                    {product.heroMetric}
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+                    {product.heroMetricContext}
+                  </p>
+                </div>
+                <div>
+                  <p className="font-display text-3xl font-bold text-[#06285A] tabular-nums dark:text-[#F36319]">
+                    {product.secondaryMetric}
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+                    {product.secondaryMetricContext}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-6 flex flex-col justify-center">
+              <div className="rounded-2xl border border-slate-200 bg-[#06285A] p-4 shadow-sm dark:border-white/10 dark:bg-[#11172B] sm:p-6">
+                <div className="mb-4 flex items-center justify-between text-xs text-slate-300">
+                  <span className="font-medium text-white">{product.tagline}</span>
+                  <span className="font-mono text-[#38BDF8] dark:text-[#F36319]">
+                    {product.landingUrlLabel}
+                  </span>
+                </div>
+                <ProductPreviewFrame
+                  productName={product.name}
+                  module={currentModule}
+                  compact
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* 5 Módulos Base do NexaERP */}
+          <div className="mt-14 grid grid-cols-1 gap-4 border-t border-slate-200 pt-10 dark:border-white/10 sm:grid-cols-2 lg:grid-cols-5">
+            {product.corePillars.map((pillar) => (
+              <div
+                key={pillar.title}
+                className="rounded-xl border border-slate-200/80 bg-[#F8FAFC] p-4 dark:border-white/10 dark:bg-[#11172B]"
+              >
+                <h2 className="font-display text-sm font-bold text-slate-900 dark:text-white">
+                  {pillar.title}
+                </h2>
+                <p className="mt-1.5 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+                  {pillar.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Soluções por Segmento no NexaERP (4 Cards) */}
+      <section
+        id="segmentos-nexa"
+        className="border-b border-slate-200 bg-[#F8FAFC] py-16 dark:border-white/10 dark:bg-[#0D1224] lg:py-20"
+      >
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="max-w-2xl">
+            <p className="font-mono text-xs font-medium tracking-wide text-[#0284C7] dark:text-[#F36319]">
+              Feito para o seu negócio · NexaERP
+            </p>
+            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+              Soluções por Segmento no NexaERP
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300 sm:text-base">
+              O NexaERP se adapta às necessidades específicas da sua empresa. Selecione um segmento para explorar as especificações detalhadas abaixo.
+            </p>
+          </div>
+
+          <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {product.modules.map((segment, idx) => {
+              const Icon = getSegmentIcon(segment.id);
+              const isActive = idx === selectedModuleIdx;
+              return (
+                <motion.article
+                  key={segment.id}
+                  initial={prefersReducedMotion ? false : { opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.15 }}
+                  transition={{
+                    duration: 0.4,
+                    delay: idx * 0.06,
+                    ease: EASE_OUT_EXPO,
+                  }}
+                  whileHover={
+                    prefersReducedMotion
+                      ? undefined
+                      : {
+                          y: -4,
+                          transition: { type: 'spring', stiffness: 320, damping: 24 },
+                        }
+                  }
+                  className={`group flex flex-col justify-between rounded-2xl border p-6 transition-colors duration-200 ${
+                    isActive
+                      ? 'border-[#06285A] bg-white shadow-sm dark:border-[#F36319] dark:bg-[#11172B]'
+                      : 'border-slate-200 bg-white hover:border-[#0284C7]/50 dark:border-white/10 dark:bg-[#11172B] dark:hover:border-[#F36319]/60'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2">
+                      <span
+                        className={`inline-flex h-10 w-10 items-center justify-center rounded-xl border transition-colors ${
+                          isActive
+                            ? 'border-[#0284C7]/40 bg-[#F8FAFC] text-[#0284C7] dark:border-[#F36319]/50 dark:bg-[#0B0F1D] dark:text-[#F36319]'
+                            : 'border-slate-200 bg-[#F8FAFC] text-[#06285A] dark:border-white/10 dark:bg-[#0B0F1D] dark:text-[#F36319]'
+                        }`}
+                      >
+                        <Icon className="h-5 w-5" aria-hidden="true" />
+                      </span>
+                      <span className="font-mono text-xs font-medium text-slate-400 dark:text-slate-500">
+                        {segment.code}
+                      </span>
+                    </div>
+
+                    <h3 className="mt-5 font-display text-lg font-bold text-slate-900 dark:text-white">
+                      {segment.name}
+                    </h3>
+                    <p className="mt-1.5 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                      {segment.summary}
+                    </p>
+
+                    <ul className="mt-5 space-y-2.5 border-t border-slate-100 pt-4 dark:border-white/10">
+                      {segment.cardHighlights.map((item) => (
+                        <li
+                          key={item}
+                          className="flex items-start gap-2 text-xs font-medium text-slate-700 dark:text-slate-200"
+                        >
+                          <Check
+                            className="mt-0.5 h-3.5 w-3.5 text-[#0284C7] dark:text-[#F36319] shrink-0"
+                            aria-hidden="true"
+                          />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="mt-6 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedModuleIdx(idx);
+                        scrollToSection('funcionalidades-produto');
+                      }}
+                      className={`w-full rounded-xl px-4 py-2.5 text-xs font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F36319] ${
+                        isActive
+                          ? 'bg-[#06285A] text-white dark:bg-[#F36319] dark:text-slate-950'
+                          : 'border border-slate-300 bg-white text-slate-800 hover:border-[#06285A] hover:bg-[#06285A] hover:text-white dark:border-white/15 dark:bg-[#0B0F1D] dark:text-white dark:hover:border-[#F36319] dark:hover:bg-[#F36319] dark:hover:text-slate-950'
+                      }`}
+                    >
+                      Ver Detalhes
+                    </button>
+                  </div>
+                </motion.article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Deep-dive Especificações & Funcionalidades por Segmento */}
+      <section id="funcionalidades-produto" className="bg-white py-16 dark:bg-[#0B0F1D] lg:py-24">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.42, ease: EASE_OUT_EXPO }}
+            className="max-w-2xl"
+          >
+            <p className="font-mono text-xs font-medium text-[#0284C7] dark:text-[#F36319]">
+              Especificações e Fluxos · {product.name}
+            </p>
+            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+              Cada segmento com rotinas prontas para operar sem adaptações improvisadas.
+            </h2>
+          </motion.div>
+
+          <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-12">
+            <div className="lg:col-span-5 space-y-3">
+              {product.modules.map((mod, index) => {
+                const isSelected = index === selectedModuleIdx;
+                return (
+                  <button
+                    key={mod.id}
+                    type="button"
+                    onClick={() => setSelectedModuleIdx(index)}
+                    className={`w-full rounded-xl border p-5 text-left transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F36319] ${
+                      isSelected
+                        ? 'border-[#06285A] bg-[#F8FAFC] shadow-sm dark:border-[#F36319] dark:bg-[#161E35]'
+                        : 'border-slate-200 bg-white hover:border-slate-300 dark:border-white/10 dark:bg-[#11172B] dark:hover:border-white/20'
+                    }`}
+                  >
+                    <p className="font-mono text-xs font-medium text-[#0284C7] dark:text-[#F36319]">
+                      Segmento {mod.code} · {mod.shortTag}
+                    </p>
+                    <h3 className="mt-1 font-display text-lg font-bold text-slate-900 dark:text-white">
+                      {mod.name}
+                    </h3>
+                    <p className="mt-1.5 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                      {mod.summary}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="lg:col-span-7 space-y-6">
+              <ProductPreviewFrame productName={product.name} module={currentModule} />
+
+              <div className="rounded-2xl border border-slate-200 bg-[#F8FAFC] p-6 dark:border-white/10 dark:bg-[#11172B]">
+                <h4 className="font-display text-base font-bold text-slate-900 dark:text-white">
+                  Fluxo de operação · {currentModule.name}
+                </h4>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                  {currentModule.workflow}
+                </p>
+
+                <ul className="mt-5 space-y-2.5 border-t border-slate-200/80 pt-5 dark:border-white/10">
+                  {currentModule.capabilities.map((cap) => (
+                    <li
+                      key={cap}
+                      className="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-200"
+                    >
+                      <Check
+                        className="mt-0.5 h-4 w-4 text-[#0284C7] dark:text-[#F36319] shrink-0"
+                        aria-hidden="true"
+                      />
+                      <span>{cap}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200/80 pt-4 dark:border-white/10">
+                  <span className="text-xs font-semibold text-[#06285A] dark:text-[#F36319]">
+                    Resultado esperado: {currentModule.impactMetric}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => onOpenDemoModal(currentModule.id)}
+                    className="text-xs font-semibold text-[#0284C7] underline underline-offset-4 hover:text-[#06285A] dark:text-[#F36319] dark:hover:text-white cursor-pointer"
+                  >
+                    Ver {currentModule.name} ao vivo na demo
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Integrations & Security + Case Study */}
+      <section
+        id="resultados-produto"
+        className="border-y border-slate-200 bg-[#F8FAFC] py-16 dark:border-white/10 dark:bg-[#0D1224] lg:py-24"
+      >
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
+            <div className="lg:col-span-5 space-y-8">
+              <div>
+                <div className="flex items-center gap-2 text-[#0284C7] dark:text-[#F36319]">
+                  <Blocks className="h-4 w-4" aria-hidden="true" />
+                  <span className="font-mono text-xs font-medium">Ecossistema Conectado</span>
+                </div>
+                <h3 className="mt-2 font-display text-2xl font-bold text-slate-900 dark:text-white">
+                  Integrações nativas e segurança em nuvem
+                </h3>
+                <ul className="mt-4 space-y-2 text-sm text-slate-700 dark:text-slate-200">
+                  {product.integrations.map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-center justify-between border-b border-slate-200/80 py-2 last:border-0 dark:border-white/10"
+                    >
+                      <span>{item}</span>
+                      <span className="font-mono text-xs text-slate-400 dark:text-slate-500">
+                        Suportado
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-white/10 dark:bg-[#11172B]">
+                <div className="flex items-center gap-2 text-[#06285A] dark:text-[#F36319]">
+                  <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+                  <h4 className="font-display text-sm font-bold dark:text-white">
+                    Governança &amp; Proteção de Dados
+                  </h4>
+                </div>
+                <ul className="mt-3 space-y-2">
+                  {product.securityHighlights.map((sec) => (
+                    <li
+                      key={sec}
+                      className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300"
+                    >
+                      <Check
+                        className="mt-0.5 h-3.5 w-3.5 text-[#0284C7] dark:text-[#F36319] shrink-0"
+                        aria-hidden="true"
+                      />
+                      <span>{sec}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.45, ease: EASE_OUT_EXPO }}
+              className="lg:col-span-7"
+            >
+              <div className="flex h-full flex-col justify-between rounded-2xl border border-transparent bg-[#06285A] p-8 text-white dark:border-white/10 dark:bg-[#11172B] sm:p-10">
+                <div>
+                  <div className="flex items-center justify-between gap-4 border-b border-white/15 pb-4 dark:border-white/10">
+                    <span className="font-mono text-xs font-medium text-[#38BDF8] dark:text-[#F36319]">
+                      Estudo de Caso · {product.caseStudy.sector}
+                    </span>
+                    <Quote
+                      className="h-5 w-5 text-[#38BDF8] dark:text-[#F36319]"
+                      aria-hidden="true"
+                    />
+                  </div>
+
+                  <blockquote className="mt-6 font-display text-xl font-medium leading-relaxed text-white sm:text-2xl">
+                    “{product.caseStudy.quote}”
+                  </blockquote>
+
+                  <div className="mt-8 grid grid-cols-1 gap-6 border-t border-white/15 pt-6 dark:border-white/10 sm:grid-cols-2">
+                    <div>
+                      <p className="text-xs font-semibold text-slate-300 dark:text-slate-400">
+                        Cenário anterior
+                      </p>
+                      <p className="mt-1.5 text-sm leading-relaxed text-slate-200 dark:text-slate-300">
+                        {product.caseStudy.before}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-[#38BDF8] dark:text-[#F36319]">
+                        Resultado mensurado
+                      </p>
+                      <p className="mt-1.5 text-sm leading-relaxed text-white">
+                        {product.caseStudy.outcome}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 border-t border-white/15 pt-5 dark:border-white/10">
+                  <p className="font-display text-base font-bold text-white">
+                    {product.caseStudy.author}
+                  </p>
+                  <p className="text-xs text-slate-300 dark:text-slate-400">
+                    {product.caseStudy.role} · {product.caseStudy.company}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Plans & Deployment Models */}
+      <section className="bg-white py-16 dark:bg-[#0B0F1D] lg:py-24">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="max-w-2xl">
+            <p className="font-mono text-xs font-medium text-[#0284C7] dark:text-[#F36319]">
+              Modelos de Licenciamento
+            </p>
+            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+              Escolha a escala ideal para a sua operação.
+            </h2>
+          </div>
+
+          <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
+            {product.plans.map((plan, idx) => (
+              <motion.div
+                key={plan.name}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{
+                  duration: 0.42,
+                  delay: idx * 0.08,
+                  ease: EASE_OUT_EXPO,
+                }}
+                className={`flex flex-col justify-between rounded-2xl border p-6 sm:p-7 ${
+                  plan.recommended
+                    ? 'border-[#06285A] bg-[#F8FAFC] shadow-md dark:border-[#F36319] dark:bg-[#161E35]'
+                    : 'border-slate-200 bg-white dark:border-white/10 dark:bg-[#11172B]'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-display text-xl font-bold text-slate-900 dark:text-white">
+                      {plan.name}
+                    </h3>
+                    {plan.recommended && (
+                      <span className="text-xs font-semibold text-[#0284C7] dark:text-[#F36319]">
+                        Mais adotado
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-300">
+                    {plan.audience}
+                  </p>
+
+                  <div className="mt-5 border-y border-slate-200/80 py-4 dark:border-white/10">
+                    <p className="font-display text-lg font-bold text-[#06285A] dark:text-[#F36319]">
+                      {plan.priceLabel}
+                    </p>
+                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                      {plan.billingNote}
+                    </p>
+                  </div>
+
+                  <ul className="mt-5 space-y-2.5">
+                    {plan.highlights.map((h) => (
+                      <li
+                        key={h}
+                        className="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200"
+                      >
+                        <Check
+                          className="mt-0.5 h-4 w-4 text-[#0284C7] dark:text-[#F36319] shrink-0"
+                          aria-hidden="true"
+                        />
+                        <span>{h}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    onOpenDemoModal(
+                      plan.name.includes('Sob Medida') ? 'sob-medida' : currentModule.id
+                    )
+                  }
+                  className={`mt-8 w-full rounded-xl px-4 py-3 text-sm font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F36319] ${
+                    plan.recommended
+                      ? 'bg-[#06285A] text-white hover:bg-[#0D3878] dark:bg-[#F36319] dark:text-slate-950 dark:hover:bg-[#FF7A38]'
+                      : 'border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 dark:border-white/15 dark:bg-[#0B0F1D] dark:text-white dark:hover:bg-[#1D2745]'
+                  }`}
+                >
+                  Solicitar Proposta {plan.name}
+                </button>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Product Conversion Section */}
+      <section
+        id="contato-produto"
+        className="border-t border-slate-200 bg-[#F8FAFC] py-16 dark:border-white/10 dark:bg-[#0D1224] lg:py-24"
+      >
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-white/10 dark:bg-[#11172B] sm:p-10">
+            <div className="max-w-2xl">
+              <p className="font-mono text-xs font-medium text-[#0284C7] dark:text-[#F36319]">
+                Demonstração Personalizada · {product.name}
+              </p>
+              <h2 className="mt-2 font-display text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">
+                Agende uma sessão técnica aplicada ao seu segmento.
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                Preencha os dados abaixo para testar o {product.name} ({currentModule.name}) com um especialista da Basesys.
+              </p>
+            </div>
+
+            <div className="mt-8">
+              <LeadCaptureForm defaultProductSlug={currentModule.id} />
+            </div>
+          </div>
+        </div>
+      </section>
+    </motion.div>
+  );
+}
