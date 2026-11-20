@@ -1,0 +1,25 @@
+name = "basesys-demo-leads"
+main = "src/index.ts"
+compatibility_date = "2026-03-01"
+workers_dev = true
+
+[observability]
+enabled = true
+
+[vars]
+# Domínio(s) oficial(is) autorizado(s) para CORS (separe múltiplos por vírgula, sem barra no final).
+# Substitua pelo domínio oficial da BaseSys antes de publicar em produção.
+ALLOWED_ORIGIN = "https://basesys.com.br,https://www.basesys.com.br"
+
+# Parâmetros de segurança e resiliência (não sensíveis)
+TELEGRAM_TIMEOUT_MS = "8000"
+RATE_LIMIT_MAX_REQUESTS = "5"
+RATE_LIMIT_WINDOW_SECONDS = "600"
+DEDUP_WINDOW_SECONDS = "600"
+MIN_FORM_FILL_MS = "1500"
+
+# IMPORTANTE:
+# Nunca declare TELEGRAM_BOT_TOKEN ou TELEGRAM_CHAT_ID aqui.
+# Cadastre ambos exclusivamente como Secrets via Wrangler:
+#   npx wrangler secret put TELEGRAM_BOT_TOKEN
+#   npx wrangler secret put TELEGRAM_CHAT_ID

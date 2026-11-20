@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Menu, Moon, Sun, X } from 'lucide-react';
 
 interface NavbarProps {
@@ -17,6 +17,24 @@ export function Navbar({
   onOpenDemoModal,
 }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileOpen(false);
+    };
+    const handleResize = () => {
+      if (window.innerWidth >= 768) setMobileOpen(false);
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('resize', handleResize);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [mobileOpen]);
 
   const navItems = activeSlug
     ? [
@@ -89,17 +107,20 @@ export function Navbar({
             </span>
           </a>
 
-          <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-slate-600 dark:text-slate-300">
-            {navItems.map((item) => (
-              <button
-                key={item.target}
-                type="button"
-                onClick={() => handleLinkClick(item.target)}
-                className="whitespace-nowrap shrink-0 py-1 text-slate-600 transition-colors duration-150 hover:text-[#06285A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F36319] dark:text-slate-300 dark:hover:text-[#F36319] rounded-sm cursor-pointer"
-              >
-                {item.label}
-              </button>
-            ))}
+          <nav aria-label="Navegação principal" className="hidden md:block">
+            <ul className="flex items-center gap-7 text-sm font-medium text-slate-600 dark:text-slate-300">
+              {navItems.map((item) => (
+                <li key={item.target}>
+                  <button
+                    type="button"
+                    onClick={() => handleLinkClick(item.target)}
+                    className="whitespace-nowrap shrink-0 py-1 text-slate-600 transition-colors duration-150 hover:text-[#06285A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F36319] dark:text-slate-300 dark:hover:text-[#F36319] rounded-sm cursor-pointer"
+                  >
+                    {item.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
           </nav>
 
           <div className="flex items-center gap-2.5 shrink-0">
@@ -140,24 +161,27 @@ export function Navbar({
 
         {mobileOpen && (
           <div className="mt-2 rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-lg md:hidden dark:border-white/10 dark:bg-[#11172B]">
-            <nav className="flex flex-col gap-1.5">
-              {navItems.map((item) => (
-                <button
-                  key={item.target}
-                  type="button"
-                  onClick={() => handleLinkClick(item.target)}
-                  className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-[#06285A] dark:text-slate-200 dark:hover:bg-[#161E35] dark:hover:text-[#F36319]"
-                >
-                  {item.label}
-                </button>
-              ))}
+            <nav aria-label="Navegação mobile">
+              <ul className="flex flex-col gap-1.5">
+                {navItems.map((item) => (
+                  <li key={item.target}>
+                    <button
+                      type="button"
+                      onClick={() => handleLinkClick(item.target)}
+                      className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-[#06285A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F36319] dark:text-slate-200 dark:hover:bg-[#161E35] dark:hover:text-[#F36319] cursor-pointer"
+                    >
+                      {item.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
               <button
                 type="button"
                 onClick={() => {
                   setMobileOpen(false);
                   onOpenDemoModal(activeSlug ?? undefined);
                 }}
-                className="mt-2 flex w-full items-center justify-center rounded-xl bg-[#06285A] px-4 py-3 text-sm font-semibold text-white hover:bg-[#0D3878] dark:bg-[#F36319] dark:text-slate-950 dark:hover:bg-[#FF7A38]"
+                className="mt-3 flex w-full items-center justify-center rounded-xl bg-[#06285A] px-4 py-3 text-sm font-semibold text-white hover:bg-[#0D3878] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F36319] dark:bg-[#F36319] dark:text-slate-950 dark:hover:bg-[#FF7A38] cursor-pointer"
               >
                 Agendar Demonstração
               </button>

@@ -4,6 +4,20 @@ export type NexaSegmentId =
   | 'bares-restaurantes'
   | 'saloes-barbearias';
 
+export type PreviewRowState = 'Concluído' | 'Ativo' | 'Em análise';
+
+export interface ProductPreviewRow {
+  label: string;
+  detail: string;
+  value: string;
+  state: PreviewRowState;
+}
+
+export interface ProductPreviewKpi {
+  label: string;
+  value: string;
+}
+
 export interface ProductModule {
   id: NexaSegmentId;
   code: string;
@@ -16,17 +30,25 @@ export interface ProductModule {
   impactMetric: string;
   previewTitle: string;
   previewSubtitle: string;
-  previewRows: {
-    label: string;
-    detail: string;
-    value: string;
-    state: 'Concluído' | 'Ativo' | 'Em análise';
-  }[];
-  previewKpis: {
-    label: string;
-    value: string;
-  }[];
+  previewRows: ProductPreviewRow[];
+  previewKpis: ProductPreviewKpi[];
 }
+
+export interface CompanyContact {
+  brandName: string;
+  legalName: string;
+  email: string;
+  whatsappDigits: string;
+  whatsappDisplay: string;
+}
+
+export const COMPANY_CONTACT: CompanyContact = {
+  brandName: 'Basesys',
+  legalName: 'Basesys Gestão e Tecnologia Ltda.',
+  email: 'comercial@basesys.com.br',
+  whatsappDigits: '5583999999999',
+  whatsappDisplay: '(83) 99999-9999',
+};
 
 export interface ProductCaseStudy {
   quote: string;
@@ -374,7 +396,21 @@ export const NEXA_PRODUCT: BasesysProduct = {
 
 export const PRODUCTS: BasesysProduct[] = [NEXA_PRODUCT];
 
-export const CUSTOM_SOFTWARE_OFFERING = {
+export interface CustomSoftwareOffering {
+  indexNumber: string;
+  category: string;
+  badgeLabel: string;
+  name: string;
+  tagline: string;
+  description: string;
+  metrics: {
+    value: string;
+    context: string;
+  }[];
+  deliverables: string[];
+}
+
+export const CUSTOM_SOFTWARE_OFFERING: CustomSoftwareOffering = {
   indexNumber: '02',
   category: 'Engenharia Dedicada · Qualquer Negócio',
   badgeLabel: 'Projeto Exclusivo',
@@ -414,14 +450,25 @@ export const LEAD_INTEREST_OPTIONS: LeadInterestOption[] = [
   { value: 'sob-medida', label: 'Sistema Sob Medida (Projeto Exclusivo)' },
 ];
 
-export const CORPORATE_METRICS = [
+export interface CorporateMetric {
+  value: string;
+  label: string;
+}
+
+export const CORPORATE_METRICS: CorporateMetric[] = [
   { value: '140+', label: 'Empresas operando em produção com soluções Basesys' },
   { value: '99,94%', label: 'Disponibilidade média em nuvem nos últimos 12 meses' },
   { value: 'Sob medida', label: 'Projetos exclusivos e NexaERP pronto para 4 segmentos' },
   { value: '100%', label: 'Suporte técnico nacional com equipe própria de engenharia' },
 ];
 
-export const ENGINEERING_PILLARS = [
+export interface EngineeringPillar {
+  number: string;
+  title: string;
+  description: string;
+}
+
+export const ENGINEERING_PILLARS: EngineeringPillar[] = [
   {
     number: '01',
     title: 'NexaERP Pronto & Sistemas Sob Medida',
@@ -442,7 +489,19 @@ export const ENGINEERING_PILLARS = [
   },
 ];
 
-export const HUB_RESULTS_HIGHLIGHTS = [
+export interface HubResultHighlight {
+  badge: string;
+  sector: string;
+  title: string;
+  quote: string;
+  outcome: string;
+  author: string;
+  role: string;
+  ctaLabel: string;
+  actionType: 'product' | 'custom';
+}
+
+export const HUB_RESULTS_HIGHLIGHTS: HubResultHighlight[] = [
   {
     badge: 'Produto Pronto · NexaERP',
     sector: 'Varejo, Alimentação e Beleza',

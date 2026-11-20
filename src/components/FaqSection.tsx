@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ArrowRight, ChevronDown } from 'lucide-react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 
 interface FaqItem {
   number: string;
@@ -55,7 +55,6 @@ interface FaqSectionProps {
 
 export function FaqSection({ onOpenDemoModal }: FaqSectionProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
-  const prefersReducedMotion = useReducedMotion();
 
   const toggleItem = (index: number) => {
     setOpenIndex((prev) => (prev === index ? null : index));
@@ -64,21 +63,25 @@ export function FaqSection({ onOpenDemoModal }: FaqSectionProps) {
   return (
     <section
       id="faq"
+      aria-labelledby="faq-heading"
       className="border-t border-slate-200 bg-white py-20 transition-colors duration-200 dark:border-white/10 dark:bg-[#0B0F1D] lg:py-24"
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-start">
-          <motion.div
-            initial={prefersReducedMotion ? false : { opacity: 0, y: 18 }}
+          <motion.header
+            initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
+            viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 0.45, ease: EASE_OUT_EXPO }}
             className="lg:col-span-4"
           >
             <p className="font-mono text-xs font-medium tracking-wide text-[#0284C7] dark:text-[#F36319]">
               Perguntas Frequentes
             </p>
-            <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+            <h2
+              id="faq-heading"
+              className="mt-2 font-display text-3xl font-bold tracking-tight text-slate-900 dark:text-white"
+            >
               Dúvidas comuns sobre nossos sistemas e implantação.
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300 sm:text-base">
@@ -93,20 +96,20 @@ export function FaqSection({ onOpenDemoModal }: FaqSectionProps) {
               <span>Tirar Dúvida com Especialista</span>
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </button>
-          </motion.div>
+          </motion.header>
 
-          <div className="lg:col-span-8 space-y-3">
+          <ol className="lg:col-span-8 space-y-3">
             {FAQ_ITEMS.map((item, index) => {
               const isOpen = openIndex === index;
               const buttonId = `faq-trigger-${item.number}`;
               const panelId = `faq-panel-${item.number}`;
 
               return (
-                <motion.div
+                <motion.li
                   key={item.number}
-                  initial={prefersReducedMotion ? false : { opacity: 0, y: 14 }}
+                  initial={{ opacity: 0, y: 14 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.15 }}
+                  viewport={{ once: true, amount: 0.1 }}
                   transition={{
                     duration: 0.38,
                     delay: index * 0.04,
@@ -128,7 +131,10 @@ export function FaqSection({ onOpenDemoModal }: FaqSectionProps) {
                       className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#F36319] sm:px-6 sm:py-5 cursor-pointer"
                     >
                       <span className="flex items-baseline gap-3.5">
-                        <span className="font-mono text-xs font-semibold text-[#0284C7] dark:text-[#F36319] shrink-0">
+                        <span
+                          aria-hidden="true"
+                          className="font-mono text-xs font-semibold text-[#0284C7] dark:text-[#F36319] shrink-0"
+                        >
                           {item.number}.
                         </span>
                         <span className="font-display text-base font-bold text-slate-900 dark:text-white sm:text-lg">
@@ -156,28 +162,16 @@ export function FaqSection({ onOpenDemoModal }: FaqSectionProps) {
                         id={panelId}
                         role="region"
                         aria-labelledby={buttonId}
-                        initial={
-                          prefersReducedMotion
-                            ? { opacity: 1 }
-                            : { opacity: 0, height: 0 }
-                        }
-                        animate={
-                          prefersReducedMotion
-                            ? { opacity: 1 }
-                            : { opacity: 1, height: 'auto' }
-                        }
-                        exit={
-                          prefersReducedMotion
-                            ? { opacity: 0 }
-                            : { opacity: 0, height: 0 }
-                        }
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
                         transition={{ duration: 0.28, ease: EASE_OUT_EXPO }}
                         className="overflow-hidden"
                       >
                         <motion.div
-                          initial={prefersReducedMotion ? false : { y: -6 }}
+                          initial={{ y: -6 }}
                           animate={{ y: 0 }}
-                          exit={prefersReducedMotion ? undefined : { y: -6 }}
+                          exit={{ y: -6 }}
                           transition={{ duration: 0.24, ease: EASE_OUT_EXPO }}
                           className="border-t border-slate-200/80 px-5 pt-4 pb-5 pl-12 text-sm leading-relaxed text-slate-600 dark:border-white/10 dark:text-slate-300 sm:px-6 sm:pl-14"
                         >
@@ -186,10 +180,10 @@ export function FaqSection({ onOpenDemoModal }: FaqSectionProps) {
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </motion.div>
+                </motion.li>
               );
             })}
-          </div>
+          </ol>
         </div>
       </div>
     </section>

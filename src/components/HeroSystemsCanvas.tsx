@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { useReducedMotion } from 'motion/react';
 
 interface HeroSystemsCanvasProps {
   isDark: boolean;
@@ -46,16 +45,11 @@ interface ScaleBar {
 export function HeroSystemsCanvas({ isDark }: HeroSystemsCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const prefersReducedMotion = useReducedMotion();
   const isDarkRef = useRef(isDark);
-  const drawStaticRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     isDarkRef.current = isDark;
-    if (prefersReducedMotion && drawStaticRef.current) {
-      drawStaticRef.current();
-    }
-  }, [isDark, prefersReducedMotion]);
+  }, [isDark]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -71,6 +65,7 @@ export function HeroSystemsCanvas({ isDark }: HeroSystemsCanvasProps) {
     let animationId = 0;
     let isVisible = true;
     let time = 0;
+    let lastTimestamp = 0;
 
     const pointer = {
       x: 0,
@@ -148,21 +143,52 @@ export function HeroSystemsCanvas({ isDark }: HeroSystemsCanvasProps) {
 
     const resize = () => {
       const rect = container.getBoundingClientRect();
-      width = Math.max(1, rect.width);
-      height = Math.max(1, rect.height);
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const nextWidth = Math.max(1, rect.width);
+      const nextHeight = Math.max(1, rect.height);
+      const nextDpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      if (
+        nodes.length > 0 &&
+        Math.abs(nextWidth - width) < 1 &&
+        Math.abs(nextHeight - height) < 1 &&
+        nextDpr === dpr
+      ) {
+        return;
+      }
+
+      const prevWidth = width;
+      const prevHeight = height;
+      const prevBucket = prevWidth < 640 ? 0 : prevWidth < 1024 ? 1 : 2;
+      const nextBucket = nextWidth < 640 ? 0 : nextWidth < 1024 ? 1 : 2;
+
+      width = nextWidth;
+      height = nextHeight;
+      dpr = nextDpr;
       canvas.width = Math.floor(width * dpr);
       canvas.height = Math.floor(height * dpr);
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
       if (!pointer.active) {
         pointer.x = width * 0.5;
         pointer.y = height * 0.45;
         pointer.smoothX = width * 0.5;
         pointer.smoothY = height * 0.45;
       }
-      createScene(width, height);
+
+      if (nodes.length === 0 || prevWidth <= 1 || prevHeight <= 1 || prevBucket !== nextBucket) {
+        createScene(width, height);
+      } else {
+        const sx = width / prevWidth;
+        const sy = height / prevHeight;
+        for (const node of nodes) {
+          node.x *= sx;
+          node.y *= sy;
+          node.baseX *= sx;
+          node.baseY *= sy;
+        }
+      }
     };
 
     const spawnPacket = (maxDist: number) => {
@@ -192,7 +218,7 @@ export function HeroSystemsCanvas({ isDark }: HeroSystemsCanvasProps) {
       });
     };
 
-    const drawFrame = (animate: boolean) => {
+    const drawFrame = (animate: boolean, stepFactor = 1) => {
       const dark = isDarkRef.current;
       const maxLinkDist = width < 640 ? 155 : 220;
 
@@ -201,19 +227,20 @@ export function HeroSystemsCanvas({ isDark }: HeroSystemsCanvasProps) {
       // Smooth pointer tracking & parallax interpolation
       const prevSmoothX = pointer.smoothX;
       const prevSmoothY = pointer.smoothY;
+      const lerp = (rate: number) => 1 - Math.pow(1 - rate, stepFactor);
       if (pointer.active) {
-        pointer.presence += (1 - pointer.presence) * 0.1;
-        pointer.smoothX += (pointer.x - pointer.smoothX) * 0.14;
-        pointer.smoothY += (pointer.y - pointer.smoothY) * 0.14;
-        pointer.smoothNormX += (pointer.normX - pointer.smoothNormX) * 0.08;
-        pointer.smoothNormY += (pointer.normY - pointer.smoothNormY) * 0.08;
+        pointer.presence += (1 - pointer.presence) * lerp(0.1);
+        pointer.smoothX += (pointer.x - pointer.smoothX) * lerp(0.14);
+        pointer.smoothY += (pointer.y - pointer.smoothY) * lerp(0.14);
+        pointer.smoothNormX += (pointer.normX - pointer.smoothNormX) * lerp(0.08);
+        pointer.smoothNormY += (pointer.normY - pointer.smoothNormY) * lerp(0.08);
       } else {
-        pointer.presence += (0 - pointer.presence) * 0.06;
-        pointer.smoothNormX += (0 - pointer.smoothNormX) * 0.04;
-        pointer.smoothNormY += (0 - pointer.smoothNormY) * 0.04;
+        pointer.presence += (0 - pointer.presence) * lerp(0.06);
+        pointer.smoothNormX += (0 - pointer.smoothNormX) * lerp(0.04);
+        pointer.smoothNormY += (0 - pointer.smoothNormY) * lerp(0.04);
       }
-      pointer.vx = pointer.smoothX - prevSmoothX;
-      pointer.vy = pointer.smoothY - prevSmoothY;
+      pointer.vx = (pointer.smoothX - prevSmoothX) / Math.max(0.25, stepFactor);
+      pointer.vy = (pointer.smoothY - prevSmoothY) / Math.max(0.25, stepFactor);
 
       const parallaxOffsetX = pointer.smoothNormX * 28;
       const parallaxOffsetY = pointer.smoothNormY * 20;
@@ -412,8 +439,9 @@ export function HeroSystemsCanvas({ isDark }: HeroSystemsCanvasProps) {
       // 3. Update node positions (ambient orbital drift + strong magnetic follow with cursor)
       if (animate) {
         const attractRadius = width < 640 ? 220 : 300;
+        const damping = Math.pow(0.935, stepFactor);
         for (const node of nodes) {
-          node.pulse += 0.032;
+          node.pulse += 0.032 * stepFactor;
 
           // Parallax-shifted home anchor so the entire constellation glides along with the mouse
           const targetHomeX =
@@ -426,8 +454,8 @@ export function HeroSystemsCanvas({ isDark }: HeroSystemsCanvasProps) {
             Math.cos(time * 0.6 + node.phase) * 12;
 
           // Spring gently toward drifting home anchor
-          node.vx += (targetHomeX - node.x) * 0.0022;
-          node.vy += (targetHomeY - node.y) * 0.0022;
+          node.vx += (targetHomeX - node.x) * 0.0022 * stepFactor;
+          node.vy += (targetHomeY - node.y) * 0.0022 * stepFactor;
 
           // Magnetic follow: nodes within radius pull toward the mouse and travel along with it
           if (pointer.presence > 0.01) {
@@ -438,23 +466,23 @@ export function HeroSystemsCanvas({ isDark }: HeroSystemsCanvasProps) {
               const closeness = 1 - dist / attractRadius;
               // Keep a clean orbital buffer (~46px) so nodes glide around the cursor instead of collapsing into one point
               if (dist > 46) {
-                const pullForce = closeness * closeness * 0.34 * pointer.presence;
-                node.vx += (dx / dist) * pullForce + pointer.vx * closeness * 0.045;
-                node.vy += (dy / dist) * pullForce + pointer.vy * closeness * 0.045;
+                const pullForce = closeness * closeness * 0.34 * pointer.presence * stepFactor;
+                node.vx += (dx / dist) * pullForce + pointer.vx * closeness * 0.045 * stepFactor;
+                node.vy += (dy / dist) * pullForce + pointer.vy * closeness * 0.045 * stepFactor;
               } else {
-                const cushion = (1 - dist / 46) * 0.22 * pointer.presence;
+                const cushion = (1 - dist / 46) * 0.22 * pointer.presence * stepFactor;
                 node.vx -= (dx / dist) * cushion;
                 node.vy -= (dy / dist) * cushion;
               }
             }
           }
 
-          node.x += node.vx;
-          node.y += node.vy;
+          node.x += node.vx * stepFactor;
+          node.y += node.vy * stepFactor;
 
           // Velocity damping for silky inertia
-          node.vx *= 0.935;
-          node.vy *= 0.935;
+          node.vx *= damping;
+          node.vy *= damping;
 
           // Soft bounds
           if (node.x < 12) {
@@ -536,7 +564,7 @@ export function HeroSystemsCanvas({ isDark }: HeroSystemsCanvasProps) {
 
       // 5. Update and render flowing data packets
       if (animate) {
-        if (Math.random() < 0.25) {
+        if (Math.random() < 0.25 * stepFactor) {
           spawnPacket(maxLinkDist);
         }
 
@@ -549,7 +577,7 @@ export function HeroSystemsCanvas({ isDark }: HeroSystemsCanvasProps) {
             continue;
           }
 
-          pkt.progress += pkt.speed;
+          pkt.progress += pkt.speed * stepFactor;
           const px = from.x + (to.x - from.x) * pkt.progress;
           const py = from.y + (to.y - from.y) * pkt.progress;
 
@@ -590,10 +618,11 @@ export function HeroSystemsCanvas({ isDark }: HeroSystemsCanvasProps) {
         }
 
         // Hub arrival rings
+        const ringAlphaDecay = Math.pow(0.93, stepFactor);
         for (let i = rings.length - 1; i >= 0; i--) {
           const ring = rings[i];
-          ring.radius += 0.68;
-          ring.alpha *= 0.93;
+          ring.radius += 0.68 * stepFactor;
+          ring.alpha *= ringAlphaDecay;
           ctx.strokeStyle = `rgba(${accent}, ${ring.alpha})`;
           ctx.lineWidth = 1.25;
           ctx.beginPath();
@@ -660,10 +689,16 @@ export function HeroSystemsCanvas({ isDark }: HeroSystemsCanvasProps) {
       ctx.stroke();
     };
 
-    const tick = () => {
+    const tick = (now: number) => {
+      if (lastTimestamp === 0) {
+        lastTimestamp = now;
+      }
+      const dt = Math.min(Math.max((now - lastTimestamp) / 1000, 0.001), 0.05);
+      lastTimestamp = now;
+
       if (isVisible) {
-        time += 0.016;
-        drawFrame(true);
+        time += dt;
+        drawFrame(true, dt * 60);
       }
       animationId = window.requestAnimationFrame(tick);
     };
@@ -691,14 +726,10 @@ export function HeroSystemsCanvas({ isDark }: HeroSystemsCanvasProps) {
       pointer.active = false;
     };
 
-    drawStaticRef.current = () => drawFrame(false);
     resize();
 
     const resizeObserver = new ResizeObserver(() => {
       resize();
-      if (prefersReducedMotion) {
-        drawFrame(false);
-      }
     });
     resizeObserver.observe(container);
 
@@ -711,24 +742,19 @@ export function HeroSystemsCanvas({ isDark }: HeroSystemsCanvasProps) {
     intersectionObserver.observe(container);
 
     const heroSection = container.parentElement;
-    if (!prefersReducedMotion && heroSection) {
+    if (heroSection) {
       heroSection.addEventListener('pointermove', handlePointerMove, { passive: true });
       heroSection.addEventListener('pointerleave', handlePointerLeave);
     }
 
-    if (prefersReducedMotion) {
-      drawFrame(false);
-    } else {
-      // Seed initial packets so the animation starts alive immediately
-      const initDist = width < 640 ? 155 : 220;
-      for (let k = 0; k < 12; k++) {
-        spawnPacket(initDist);
-      }
-      animationId = window.requestAnimationFrame(tick);
+    // Seed initial packets so the animation starts alive immediately
+    const initDist = width < 640 ? 155 : 220;
+    for (let k = 0; k < 12; k++) {
+      spawnPacket(initDist);
     }
+    animationId = window.requestAnimationFrame(tick);
 
     return () => {
-      drawStaticRef.current = null;
       if (animationId) window.cancelAnimationFrame(animationId);
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
@@ -737,7 +763,7 @@ export function HeroSystemsCanvas({ isDark }: HeroSystemsCanvasProps) {
         heroSection.removeEventListener('pointerleave', handlePointerLeave);
       }
     };
-  }, [prefersReducedMotion]);
+  }, []);
 
   return (
     <div

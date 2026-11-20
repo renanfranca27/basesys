@@ -1,0 +1,7 @@
+# Variáveis locais para desenvolvimento com `wrangler dev`.
+# Copie este arquivo para `.dev.vars` (que está no .gitignore) e preencha com valores reais.
+# NUNCA versione `.dev.vars` nem coloque credenciais no frontend ou no wrangler.toml.
+
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+ALLOWED_ORIGIN=http://localhost:3000,http://127.0.0.1:3000
