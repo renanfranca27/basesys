@@ -310,7 +310,7 @@ export function MidwayHub({
       <section
         id="resultados"
         aria-labelledby="resultados-heading"
-        className="border-t border-slate-200 bg-white py-20 transition-colors duration-200 dark:border-white/10 dark:bg-[#0B0F1D] lg:py-24"
+        className="border-t border-slate-200 bg-white py-20 transition-colors duration-200 dark:border-white/10 dark:bg-obsidian-950 lg:py-24"
       >
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <motion.header
@@ -343,11 +343,11 @@ export function MidwayHub({
                   delay: idx * 0.08,
                   ease: EASE_OUT_EXPO,
                 }}
-                className="rounded-2xl border border-slate-200 bg-[#F8FAFC] p-6 dark:border-white/10 dark:bg-[#11172B] sm:p-7"
+                className="rounded-2xl border border-slate-200 bg-[#F8FAFC] p-6 dark:border-white/10 dark:bg-obsidian-900 sm:p-7"
               >
                 <p
                   aria-hidden="true"
-                  className="font-mono text-xs font-semibold text-[#0284C7] dark:text-[#F36319]"
+                  className="font-mono text-xs font-semibold text-[#0284C7] dark:text-brand-accent"
                 >
                   {pillar.number}.
                 </p>
@@ -376,7 +376,7 @@ export function MidwayHub({
                 className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-[#06285A] p-7 text-white dark:border-white/10 dark:bg-[#11172B] sm:p-8"
               >
                 <figure>
-                  <p className="font-mono text-xs font-medium text-[#38BDF8] dark:text-[#F36319]">
+                  <p className="font-mono text-xs font-medium text-[#38BDF8] dark:text-brand-accent">
                     {item.badge} · {item.sector}
                   </p>
                   <blockquote className="mt-4 font-display text-lg font-medium leading-relaxed text-white">

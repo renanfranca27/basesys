@@ -69,7 +69,7 @@ export function ProductLandingPage({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: EASE_OUT_EXPO }}
-      className="bg-[#F8FAFC] transition-colors duration-200 dark:bg-[#0B0F1D]"
+      className="bg-[#F8FAFC] transition-colors duration-200 dark:bg-obsidian-950"
     >
       {/* Contextual Sub-bar: Voltar + Atalho para os 4 Segmentos do NexaERP */}
       <nav
@@ -100,8 +100,8 @@ export function ProductLandingPage({
                     }}
                     className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F36319] ${
                       active
-                        ? 'bg-[#06285A] text-white dark:bg-[#F36319] dark:text-slate-950'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-[#161E35] dark:hover:text-white'
+                        ? 'bg-[#06285A] text-white dark:bg-brand-accent dark:text-slate-950'
+                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-obsidian-800 dark:hover:text-white'
                     }`}
                   >
                     {seg.name}
@@ -116,18 +116,18 @@ export function ProductLandingPage({
       {/* Dedicated NexaERP Hero */}
       <section
         aria-labelledby="product-hero-heading"
-        className="border-b border-slate-200 bg-white py-16 dark:border-white/10 dark:bg-[#0B0F1D] lg:py-20"
+        className="border-b border-slate-200 bg-white py-16 dark:border-white/10 dark:bg-obsidian-950 lg:py-20"
       >
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-stretch">
             <div className="lg:col-span-6 flex flex-col justify-between">
               <div>
-                <p className="font-mono text-xs font-medium text-[#0284C7] dark:text-[#F36319]">
+                <p className="font-mono text-xs font-medium text-[#0284C7] dark:text-brand-accent">
                   {product.name} · {product.category}
                 </p>
                 <h1
                   id="product-hero-heading"
-                  className="mt-3 font-display text-[clamp(2.1rem,3.6vw,3.25rem)] font-bold leading-[1.08] tracking-[-0.025em] text-slate-900 dark:text-white"
+                  className="mt-3 font-display text-[clamp(2.1rem,3.6vw,3.25rem)] font-bold leading-[1.08] tracking-tight text-slate-900 dark:text-white"
                 >
                   {product.headline}
                 </h1>
@@ -199,7 +199,7 @@ export function ProductLandingPage({
             {product.corePillars.map((pillar) => (
               <li
                 key={pillar.title}
-                className="rounded-xl border border-slate-200/80 bg-[#F8FAFC] p-4 dark:border-white/10 dark:bg-[#11172B]"
+                className="rounded-xl border border-slate-200/80 bg-[#F8FAFC] p-4 dark:border-white/10 dark:bg-obsidian-900"
               >
                 <h2 className="font-display text-sm font-bold text-slate-900 dark:text-white">
                   {pillar.title}
@@ -221,7 +221,7 @@ export function ProductLandingPage({
       >
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <header className="max-w-2xl">
-            <p className="font-mono text-xs font-medium tracking-wide text-[#0284C7] dark:text-[#F36319]">
+            <p className="font-mono text-xs font-medium tracking-wide text-[#0284C7] dark:text-brand-accent">
               Feito para o seu negócio · NexaERP
             </p>
             <h2

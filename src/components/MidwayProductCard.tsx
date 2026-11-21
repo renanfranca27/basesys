@@ -27,7 +27,7 @@ export function MidwayProductCard({
               <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
                 {product.indexNumber} · {product.category}
               </span>
-              <span className="font-mono text-xs font-semibold text-[#0284C7] dark:text-[#F36319]">
+              <span className="font-mono text-xs font-semibold text-[#0284C7] dark:text-brand-accent">
                 Produto Pronto
               </span>
             </header>
@@ -35,7 +35,7 @@ export function MidwayProductCard({
             <h3 className="mt-5 font-display text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
               {product.name}
             </h3>
-            <p className="mt-1.5 text-sm font-medium text-[#06285A] dark:text-[#F36319]">
+            <p className="mt-1.5 text-sm font-medium text-[#06285A] dark:text-brand-accent">
               {product.tagline}
             </p>
             <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
@@ -44,13 +44,13 @@ export function MidwayProductCard({
 
             <motion.dl
               style={{ x: parallaxX, y: parallaxY }}
-              className="mt-6 grid grid-cols-2 gap-4 rounded-xl border border-slate-100 bg-[#F8FAFC] p-4 transition-colors duration-200 group-hover:border-slate-200 dark:border-white/10 dark:bg-[#0B0F1D] dark:group-hover:border-white/15"
+              className="mt-6 grid grid-cols-1 gap-4 rounded-xl border border-slate-100 bg-[#F8FAFC] p-4 transition-colors duration-200 group-hover:border-slate-200 dark:border-white/10 dark:bg-[#0B0F1D] dark:group-hover:border-white/15 sm:grid-cols-2"
             >
-              <div className="flex flex-col-reverse">
+              <div className="flex flex-col-reverse border-b border-slate-200 pb-4 dark:border-white/10 sm:border-b-0 sm:border-r sm:pb-0 sm:pr-4">
                 <dt className="mt-1 text-xs leading-snug text-slate-600 dark:text-slate-300">
                   {product.heroMetricContext}
                 </dt>
-                <dd className="font-display text-2xl font-extrabold text-[#06285A] tabular-nums dark:text-[#F36319]">
+                <dd className="font-display text-xl font-extrabold text-[#06285A] tabular-nums dark:text-[#F36319] sm:text-2xl">
                   {product.heroMetric}
                 </dd>
               </div>
@@ -58,7 +58,7 @@ export function MidwayProductCard({
                 <dt className="mt-1 text-xs leading-snug text-slate-600 dark:text-slate-300">
                   {product.secondaryMetricContext}
                 </dt>
-                <dd className="font-display text-2xl font-extrabold text-[#06285A] tabular-nums dark:text-[#F36319]">
+                <dd className="font-display text-xl font-extrabold text-[#06285A] tabular-nums dark:text-[#F36319] sm:text-2xl">
                   {product.secondaryMetric}
                 </dd>
               </div>

@@ -91,7 +91,7 @@ export function Navbar({
               setMobileOpen(false);
               onNavigateHome();
             }}
-            className="flex items-center gap-2.5 whitespace-nowrap shrink-0 rounded-md py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F36319]"
+            className="flex items-center gap-2.5 whitespace-nowrap shrink-0 rounded-md py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
             aria-label="Basesys página inicial"
           >
             <span className="relative h-9 w-9 overflow-hidden rounded-xl bg-[#06285A] shrink-0 dark:bg-transparent">
@@ -99,7 +99,7 @@ export function Navbar({
                 src="/assets/aistudio/logooficial_8bf58cab.png"
                 alt="Símbolo Basesys"
                 referrerPolicy="no-referrer"
-                className="pointer-events-none absolute left-1/2 top-1/2 h-[230%] w-[230%] max-w-none -translate-x-1/2 -translate-y-[34.6%] select-none"
+                className="pointer-events-none absolute left-1/2 top-1/2 h-[230%] w-[230%] max-w-none -translate-x-1/2 translate-y-[-34.6%] select-none"
               />
             </span>
             <span className="font-display text-lg font-bold tracking-tight text-[#06285A] dark:text-white">

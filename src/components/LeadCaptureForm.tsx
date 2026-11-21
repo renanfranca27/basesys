@@ -174,7 +174,7 @@ export function LeadCaptureForm({
               Solicitação registrada para {selectedInterest.label}
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-200">
-              Obrigado, <span className="font-semibold">{name.trim()}</span>. Recebemos os dados de{' '}
+              Obrigado, <span className="font-semibold">{name.trim()}</span>. Recebemos os dados da{' '}
               <span className="font-semibold">{company.trim()}</span> ({email.trim()} · {teamSize}).
               Um especialista da Basesys entrará em contato em até 2 horas úteis para apresentar o
               ambiente de demonstração.

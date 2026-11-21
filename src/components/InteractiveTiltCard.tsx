@@ -81,7 +81,7 @@ export function InteractiveTiltCard({ delay = 0, children }: InteractiveTiltCard
           rotateY,
           transformStyle: 'preserve-3d',
         }}
-        className="group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-xs transition-[border-color,box-shadow,background-color] duration-200 hover:border-[#0EA5E9]/40 hover:shadow-lg dark:border-white/10 dark:bg-[#11172B] dark:hover:border-[#F36319]/45 sm:p-8"
+        className="group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-xs transition-[border-color,box-shadow,background-color] duration-200 hover:border-[#0EA5E9]/40 hover:shadow-lg dark:border-white/10 dark:bg-obsidian-900 dark:hover:border-brand-accent/45 sm:p-6 lg:p-8"
       >
         <motion.div
           aria-hidden="true"
