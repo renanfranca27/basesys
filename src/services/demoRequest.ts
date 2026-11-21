@@ -18,10 +18,12 @@ export interface DemoRequestResult {
 }
 
 const REQUEST_TIMEOUT_MS = 15_000;
+const DEFAULT_DEMO_API_URL = 'https://basesys-demo-leads.renanfrancabrito27.workers.dev';
 
 function getDemoEndpointUrl(): string {
   const raw = import.meta.env.VITE_DEMO_API_URL;
-  return typeof raw === 'string' ? raw.trim() : '';
+  const configured = typeof raw === 'string' ? raw.trim() : '';
+  return configured || DEFAULT_DEMO_API_URL;
 }
 
 export function generateIdempotencyKey(): string {
