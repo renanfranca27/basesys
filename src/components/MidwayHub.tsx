@@ -395,18 +395,25 @@ export function MidwayHub({
                         {item.role}
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        item.actionType === 'product'
-                          ? onSelectLandingPage(NEXA_PRODUCT.slug)
-                          : onOpenDemoModal('sob-medida')
-                      }
-                      className="inline-flex items-center gap-1.5 rounded-sm text-xs font-semibold text-[#38BDF8] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F36319] dark:text-[#F36319] dark:hover:text-[#FF7A38] whitespace-nowrap shrink-0 cursor-pointer"
-                    >
-                      <span>{item.ctaLabel}</span>
-                      <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-                    </button>
+                    {item.actionType === 'product' ? (
+                      <button
+                        type="button"
+                        onClick={() => window.open('https://nexaerp.com.br', '_blank')}
+                        className="inline-flex items-center gap-1.5 rounded-sm text-xs font-semibold text-[#38BDF8] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F36319] dark:text-[#F36319] dark:hover:text-[#FF7A38] whitespace-nowrap shrink-0 cursor-pointer"
+                      >
+                        <span>{item.ctaLabel}</span>
+                        <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => onOpenDemoModal('sob-medida')}
+                        className="inline-flex items-center gap-1.5 rounded-sm text-xs font-semibold text-[#38BDF8] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F36319] dark:text-[#F36319] dark:hover:text-[#FF7A38] whitespace-nowrap shrink-0 cursor-pointer"
+                      >
+                        <span>{item.ctaLabel}</span>
+                        <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                      </button>
+                    )}
                   </figcaption>
                 </figure>
               </motion.article>
