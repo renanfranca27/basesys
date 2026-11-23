@@ -95,7 +95,7 @@ export function Footer({ onNavigateHome }: FooterProps) {
             <ul className="mt-5 flex items-center gap-5 text-slate-700 dark:text-white">
               <li>
                 <a
-                  href="https://www.instagram.com"
+                  href="https://www.instagram.com/basesys.tecnologia/"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Instagram"

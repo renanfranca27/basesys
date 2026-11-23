@@ -44,9 +44,9 @@ export function MidwayProductCard({
 
             <motion.dl
               style={{ x: parallaxX, y: parallaxY }}
-              className="mt-6 grid grid-cols-1 gap-4 rounded-xl border border-slate-100 bg-[#F8FAFC] p-4 transition-colors duration-200 group-hover:border-slate-200 dark:border-white/10 dark:bg-[#0B0F1D] dark:group-hover:border-white/15 sm:grid-cols-2"
+              className="mt-6 grid grid-cols-2 items-start gap-3 rounded-xl border border-slate-100 bg-[#F8FAFC] p-4 transition-colors duration-200 group-hover:border-slate-200 dark:border-white/10 dark:bg-[#0B0F1D] dark:group-hover:border-white/15 sm:gap-4"
             >
-              <div className="flex flex-col-reverse border-b border-slate-200 pb-4 dark:border-white/10 sm:border-b-0 sm:border-r sm:pb-0 sm:pr-4">
+              <div className="flex flex-col-reverse border-r border-slate-200 pr-3 dark:border-white/10 sm:pr-4">
                 <dt className="mt-1 text-xs leading-snug text-slate-600 dark:text-slate-300">
                   {product.heroMetricContext}
                 </dt>
